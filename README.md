@@ -3,12 +3,13 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v2.2.23--Fixed-10b981.svg?style=for-the-badge&logo=googlechrome&logoColor=white)](#)
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-059669.svg?style=for-the-badge)](LICENSE)
+[![Download Extension](https://img.shields.io/badge/Download_Extension-v2.2.23-10b981?style=for-the-badge&logo=github&logoColor=white)](https://github.com/tausif-rahaman-raiyan/Prayer-Focus-Extension/releases/tag/v2.2.23)
+[![Version](https://img.shields.io/badge/Version-v2.2.23--Fixed-059669.svg?style=for-the-badge&logo=googlechrome&logoColor=white)](https://github.com/tausif-rahaman-raiyan/Prayer-Focus-Extension/releases/tag/v2.2.23)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-047857.svg?style=for-the-badge)](LICENSE)
 [![React 18](https://img.shields.io/badge/Frontend-React_18-3b82f6.svg?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Bundler-Vite-6366f1.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind_v4-06b6d4.svg?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Manifest V3](https://img.shields.io/badge/Extension-Manifest_V3-f59e0b.svg?style=for-the-badge&logo=googlechrome&logoColor=white)](#)
+[![Manifest V3](https://img.shields.io/badge/Extension-Manifest_V3-f59e0b.svg?style=for-the-badge&logo=googlechrome&logoColor=white)](https://github.com/tausif-rahaman-raiyan/Prayer-Focus-Extension/releases/tag/v2.2.23)
 
 </div>
 
@@ -137,9 +138,9 @@ $$P_{\text{Waqt}} = \min\left(100, \max\left(0, \frac{T_{\text{Current}} - T_{\t
 ### Option A: Install Chrome Extension (Pre-built ZIP)
 
 > [!IMPORTANT]
-> The extension package `Prayer-Focus-v2.2.23-Fixed.zip` is located directly in the root of the project directory.
+> Download the official packed release **[`Prayer-Focus-v2.2.23-Fixed.zip`](https://github.com/tausif-rahaman-raiyan/Prayer-Focus-Extension/releases/tag/v2.2.23)** directly from the [GitHub Release v2.2.23 Page](https://github.com/tausif-rahaman-raiyan/Prayer-Focus-Extension/releases/tag/v2.2.23) or locate it in the project root folder.
 
-1. **Download / Extract**: Unpack `Prayer-Focus-v2.2.23-Fixed.zip` to a folder on your computer.
+1. **Download / Extract**: Download and unpack [`Prayer-Focus-v2.2.23-Fixed.zip`](https://github.com/tausif-rahaman-raiyan/Prayer-Focus-Extension/releases/tag/v2.2.23) to a local folder.
 2. **Open Extensions**: Navigate to `chrome://extensions/` in Google Chrome or Microsoft Edge.
 3. **Enable Developer Mode**: Turn on the **Developer mode** toggle in the top-right corner.
 4. **Load Extension**: Click **Load unpacked** and select the extracted folder.
@@ -218,6 +219,7 @@ npm run build && node scripts/pack-extension.js
 ### Designed & Developed by **Tausif Rahaman Raiyan**
 
 [![Website](https://img.shields.io/badge/Portfolio-tausif--rahaman--raiyan.github.io-10b981?style=for-the-badge&logo=github&logoColor=white)](https://tausif-rahaman-raiyan.github.io/)
+[![Download Extension](https://img.shields.io/badge/Download_Extension-v2.2.23-059669?style=for-the-badge&logo=googlechrome&logoColor=white)](https://github.com/tausif-rahaman-raiyan/Prayer-Focus-Extension/releases/tag/v2.2.23)
 [![Instagram](https://img.shields.io/badge/Instagram-@tausifrahamanraiyan-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/tausifrahamanraiyan/)
 
 </div>

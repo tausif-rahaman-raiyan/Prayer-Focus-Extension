@@ -61,21 +61,21 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNotify }) => {
           </div>
 
           <div className="shrink-0 flex flex-col sm:flex-row md:flex-col gap-2 w-full md:w-auto">
+            <a
+              href="https://github.com/tausif-rahaman-raiyan/Prayer-Focus-Extension/releases/tag/v2.2.23"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Download className="w-4 h-4" /> Download Extension (v2.2.23)
+            </a>
             <button
               onClick={handleDownload}
               disabled={downloading}
-              className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-400 font-medium text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
-              <Download className="w-4 h-4" />
-              {downloading ? 'Preparing ZIP...' : 'Download Extension (.zip)'}
+              <Download className="w-3.5 h-3.5" /> {downloading ? 'Preparing ZIP...' : 'Generate Fresh ZIP'}
             </button>
-            <a
-              href="/Prayer-Focus-v2.2.23-Fixed.zip"
-              download="Prayer-Focus-v2.2.23-Fixed.zip"
-              className="px-4 py-2.5 rounded-xl border border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-400 font-medium text-xs transition-colors flex items-center justify-center gap-1.5"
-            >
-              <Download className="w-3.5 h-3.5" /> Direct ZIP Link (v2.2.23)
-            </a>
           </div>
         </div>
       </div>
@@ -90,7 +90,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNotify }) => {
           <li className="p-4 rounded-xl bg-[var(--bg-canvas)] border border-[var(--color-border)]">
             <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold mb-2">1</span>
             <strong className="block text-sm font-semibold text-[var(--color-text)] mb-1">Download & Unzip</strong>
-            <p className="text-[var(--color-text-muted)]">Click the download button above to save <code className="text-emerald-400 font-mono text-[11px]">Prayer-Focus-v2.2.21-Fixed.zip</code>, then extract it to a local folder.</p>
+            <p className="text-[var(--color-text-muted)]">Click the download button above to save <code className="text-emerald-400 font-mono text-[11px]">Prayer-Focus-v2.2.23-Fixed.zip</code>, then extract it to a local folder.</p>
           </li>
           <li className="p-4 rounded-xl bg-[var(--bg-canvas)] border border-[var(--color-border)]">
             <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold mb-2">2</span>

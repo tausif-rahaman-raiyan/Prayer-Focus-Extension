@@ -9,7 +9,8 @@ import {
   Clock,
   ShieldCheck,
   CheckCircle2,
-  BellRing
+  BellRing,
+  Download
 } from 'lucide-react';
 import {
   PrayerTimes,
@@ -262,15 +263,18 @@ export const FullDashboard: React.FC<FullDashboardProps> = ({
               <Volume2 className="w-4 h-4" />
             </button>
 
-            {/* Mini Popup toggle */}
-            <button
-              onClick={onOpenMiniWidget}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-medium transition-colors cursor-pointer"
-              title="Switch to Chrome extension mini popup preview"
+            {/* Download Extension v2.2.23 Direct Link */}
+            <a
+              href="https://github.com/tausif-rahaman-raiyan/Prayer-Focus-Extension/releases/tag/v2.2.23"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold transition-all shadow-md cursor-pointer"
+              title="Download Prayer Focus Chrome Extension v2.2.23 from GitHub Releases"
             >
-              <Minimize2 className="w-3.5 h-3.5" />
-              <span>Mini Popup</span>
-            </button>
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline">Download Extension</span>
+              <span className="xl:hidden">v2.2.23</span>
+            </a>
           </div>
         </header>
 
