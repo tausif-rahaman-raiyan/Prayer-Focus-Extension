@@ -8,9 +8,14 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build-and-release:
-    name: Build & Release Extension ZIP
+    name: Build, Deploy Web & Release Extension ZIP
     runs-on: ubuntu-latest
 
     steps:
@@ -37,6 +42,13 @@ jobs:
           npm run build
           node scripts/pack-extension.js
 
+      - name: Deploy Compiled Site to GitHub Pages (gh-pages branch)
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+
       - name: Verify Extension ZIP Exists
         run: |
           ls -lh public/Prayer-Focus-v2.2.23-Fixed.zip || ls -lh public/Prayer-Focus-*.zip
@@ -56,7 +68,6 @@ jobs:
         with:
           files: |
             Prayer-Focus-v2.2.23-Fixed.zip
-            Prayer-Focus-v2.2.22-Fixed.zip
           name: Prayer Focus Extension ${{ github.ref_name }}
           draft: false
           prerelease: false

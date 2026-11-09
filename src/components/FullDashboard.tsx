@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Menu,
   Volume2,
@@ -77,6 +77,7 @@ export interface FullDashboardProps {
   onSaveManualOverrides: (overrides: ManualPrayerOverrides) => void;
   minuteOffsets: PrayerMinuteOffsets;
   onSaveMinuteOffsets: (offsets: PrayerMinuteOffsets) => void;
+  onResetAllSettings?: () => void;
 }
 
 export const FullDashboard: React.FC<FullDashboardProps> = ({
@@ -113,7 +114,8 @@ export const FullDashboard: React.FC<FullDashboardProps> = ({
   manualOverrides,
   onSaveManualOverrides,
   minuteOffsets,
-  onSaveMinuteOffsets
+  onSaveMinuteOffsets,
+  onResetAllSettings
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [soundPlayed, setSoundPlayed] = useState(false);
@@ -129,6 +131,55 @@ export const FullDashboard: React.FC<FullDashboardProps> = ({
     start: times.dhuhr,
     end: times.asr
   });
+
+  const lastAlertedMinuteRef = useRef<string>('');
+
+  // Auto Namaz Entry Alert Detector
+  useEffect(() => {
+    const hours = String(currentTime.getHours()).padStart(2, '0');
+    const mins = String(currentTime.getMinutes()).padStart(2, '0');
+    const timeStr = `${hours}:${mins}`;
+    const dateStr = currentTime.toISOString().split('T')[0];
+    const minuteKey = `${dateStr}-${timeStr}`;
+
+    if (lastAlertedMinuteRef.current === minuteKey) return;
+
+    const waqts = [
+      { key: 'fajr', name: 'Fajr', nameBn: 'ফজর', start: times.fajr, end: times.sunrise },
+      { key: 'dhuhr', name: 'Dhuhr', nameBn: 'যোহর', start: times.dhuhr, end: times.asr },
+      { key: 'asr', name: 'Asr', nameBn: 'আসর', start: times.asr, end: times.maghrib },
+      { key: 'maghrib', name: 'Maghrib', nameBn: 'মাগরিব', start: times.maghrib, end: times.isha },
+      { key: 'isha', name: 'Isha', nameBn: 'এশা', start: times.isha, end: times.fajr }
+    ];
+
+    for (const w of waqts) {
+      if (timeStr === w.start && !completedPrayers[w.key]) {
+        lastAlertedMinuteRef.current = minuteKey;
+        setActiveAlertWaqt({
+          name: w.name,
+          nameBn: w.nameBn,
+          key: w.key,
+          start: w.start,
+          end: w.end
+        });
+        setReminderModalOpen(true);
+        if (notifications.soundEnabled) {
+          playIslamicChime();
+        }
+
+        // Trigger native Desktop Notification
+        if (notifications.enabled && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+          try {
+            new Notification(`It's ${w.name} Namaz Time! (${w.nameBn})`, {
+              body: `${w.start} – ${w.end}\nএখন ${w.nameBn} সালাতের ওয়াক্ত\n\n"${hourlyQuote.bengali}"`,
+              icon: './icons/app-logo.png'
+            });
+          } catch (e) {}
+        }
+        break;
+      }
+    }
+  }, [currentTime, times, completedPrayers, notifications, hourlyQuote]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -396,6 +447,10 @@ export const FullDashboard: React.FC<FullDashboardProps> = ({
                 showToast('Minute steppers adjusted successfully');
               }}
               currentTimes={times}
+              onResetAllSettings={() => {
+                onResetAllSettings?.();
+                showToast('All settings and data have been reset to default state');
+              }}
             />
           )}
 

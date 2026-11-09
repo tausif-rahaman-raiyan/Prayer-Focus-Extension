@@ -7,32 +7,49 @@ async function getStoredState() {
   return new Promise((resolve) => {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       chrome.storage.local.get([
+        'PRAYER_FOCUS_TIMES',
+        'prayer_focus_times',
+        'PRAYER_FOCUS_LOCATION',
         'prayer_focus_location',
         'location_info',
+        'PRAYER_FOCUS_OFFSETS',
+        'prayer_focus_minute_offsets',
+        'PRAYER_FOCUS_OVERRIDES',
+        'prayer_focus_manual_overrides',
         'prayer_focus_provider',
         'active_provider',
         'prayer_focus_juristic',
         'juristic_method',
+        'PRAYER_FOCUS_COMPLETED',
         'prayer_focus_completed',
         'completed_prayers'
       ], (items) => {
-        const loc = items.prayer_focus_location || items.location_info || null;
+        const storedTimes = items.PRAYER_FOCUS_TIMES || items.prayer_focus_times || null;
+        const loc = items.PRAYER_FOCUS_LOCATION || items.prayer_focus_location || items.location_info || null;
+        const offsets = items.PRAYER_FOCUS_OFFSETS || items.prayer_focus_minute_offsets || null;
+        const overrides = items.PRAYER_FOCUS_OVERRIDES || items.prayer_focus_manual_overrides || null;
         const provider = items.prayer_focus_provider || items.active_provider || 'aladhan_coords';
         const juristic = items.prayer_focus_juristic || items.juristic_method || 'hanafi';
-        const completed = items.prayer_focus_completed || items.completed_prayers || {};
-        resolve({ loc, provider, juristic, completed });
+        const completed = items.PRAYER_FOCUS_COMPLETED || items.prayer_focus_completed || items.completed_prayers || {};
+        resolve({ storedTimes, loc, offsets, overrides, provider, juristic, completed });
       });
     } else {
       try {
+        const timesStr = localStorage.getItem('PRAYER_FOCUS_TIMES') || localStorage.getItem('prayer_focus_times');
+        const storedTimes = timesStr ? JSON.parse(timesStr) : null;
         const locStr = localStorage.getItem('prayer_focus_location') || localStorage.getItem('location_info');
         const loc = locStr ? JSON.parse(locStr) : null;
+        const offStr = localStorage.getItem('prayer_focus_minute_offsets');
+        const offsets = offStr ? JSON.parse(offStr) : null;
+        const overStr = localStorage.getItem('prayer_focus_manual_overrides');
+        const overrides = overStr ? JSON.parse(overStr) : null;
         const provider = localStorage.getItem('prayer_focus_provider') || localStorage.getItem('active_provider') || 'aladhan_coords';
         const juristic = localStorage.getItem('prayer_focus_juristic') || localStorage.getItem('juristic_method') || 'hanafi';
         const compStr = localStorage.getItem('prayer_focus_completed') || localStorage.getItem('completed_prayers');
         const completed = compStr ? JSON.parse(compStr) : {};
-        resolve({ loc, provider, juristic, completed });
+        resolve({ storedTimes, loc, offsets, overrides, provider, juristic, completed });
       } catch (e) {
-        resolve({ loc: null, provider: 'aladhan_coords', juristic: 'hanafi', completed: {} });
+        resolve({ storedTimes: null, loc: null, offsets: null, overrides: null, provider: 'aladhan_coords', juristic: 'hanafi', completed: {} });
       }
     }
   });
@@ -54,6 +71,16 @@ function parseHHMM(timeStr, baseDate = new Date()) {
   const d = new Date(baseDate);
   d.setHours(h, m, 0, 0);
   return d;
+}
+
+function shiftTimeMinutes(timeStr, deltaMinutes) {
+  if (!timeStr || !deltaMinutes) return timeStr;
+  const parsed = parseHHMM(timeStr);
+  if (!parsed) return timeStr;
+  parsed.setMinutes(parsed.getMinutes() + deltaMinutes);
+  const h = String(parsed.getHours()).padStart(2, '0');
+  const m = String(parsed.getMinutes()).padStart(2, '0');
+  return `${h}:${m}`;
 }
 
 function sanitize12h(timeStr) {
@@ -90,10 +117,37 @@ function formatCountdownDigital(seconds) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+function applyMinuteOffsetsAndOverrides(timings, offsets, overrides) {
+  let res = { ...timings };
+
+  if (offsets) {
+    if (offsets.fajr) res.Fajr = shiftTimeMinutes(res.Fajr, offsets.fajr);
+    if (offsets.sunrise) res.Sunrise = shiftTimeMinutes(res.Sunrise, offsets.sunrise);
+    if (offsets.dhuhr) res.Dhuhr = shiftTimeMinutes(res.Dhuhr, offsets.dhuhr);
+    if (offsets.asr) res.Asr = shiftTimeMinutes(res.Asr, offsets.asr);
+    if (offsets.maghrib) res.Maghrib = shiftTimeMinutes(res.Maghrib, offsets.maghrib);
+    if (offsets.isha) res.Isha = shiftTimeMinutes(res.Isha, offsets.isha);
+  }
+
+  if (overrides && overrides.enabled) {
+    if (overrides.fajr) res.Fajr = overrides.fajr;
+    if (overrides.sunrise) res.Sunrise = overrides.sunrise;
+    if (overrides.dhuhr) res.Dhuhr = overrides.dhuhr;
+    if (overrides.asr) res.Asr = overrides.asr;
+    if (overrides.maghrib) res.Maghrib = overrides.maghrib;
+    if (overrides.isha) res.Isha = overrides.isha;
+  }
+
+  return res;
+}
+
 // Resilient Working API Fallback with stored lat/lng
-async function fetchPrayerTimes(lat = 22.3569, lng = 91.7832, juristic = 'hanafi') {
+async function fetchPrayerTimes(lat = 22.3569, lng = 91.7832, juristic = 'hanafi', offsets = null, overrides = null) {
   const ts = Math.floor(Date.now() / 1000);
   const school = juristic === 'hanafi' ? 1 : 0;
+
+  let baseTimings = null;
+  let providerName = 'Local Solar Engine';
 
   // 1. AlAdhan Coordinates
   try {
@@ -101,17 +155,15 @@ async function fetchPrayerTimes(lat = 22.3569, lng = 91.7832, juristic = 'hanafi
     if (res.ok) {
       const data = await res.json();
       if (data?.data?.timings) {
-        return {
-          timings: {
-            Fajr: sanitize12h(data.data.timings.Fajr),
-            Sunrise: sanitize12h(data.data.timings.Sunrise),
-            Dhuhr: sanitize12h(data.data.timings.Dhuhr),
-            Asr: sanitize12h(data.data.timings.Asr),
-            Maghrib: sanitize12h(data.data.timings.Maghrib),
-            Isha: sanitize12h(data.data.timings.Isha)
-          },
-          provider: 'AlAdhan API'
+        baseTimings = {
+          Fajr: sanitize12h(data.data.timings.Fajr),
+          Sunrise: sanitize12h(data.data.timings.Sunrise),
+          Dhuhr: sanitize12h(data.data.timings.Dhuhr),
+          Asr: sanitize12h(data.data.timings.Asr),
+          Maghrib: sanitize12h(data.data.timings.Maghrib),
+          Isha: sanitize12h(data.data.timings.Isha)
         };
+        providerName = 'AlAdhan API';
       }
     }
   } catch (e) {
@@ -119,56 +171,62 @@ async function fetchPrayerTimes(lat = 22.3569, lng = 91.7832, juristic = 'hanafi
   }
 
   // 2. AlAdhan City-Based
-  try {
-    const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Chattogram&country=Bangladesh&method=1&school=${school}`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.data?.timings) {
-        return {
-          timings: {
+  if (!baseTimings) {
+    try {
+      const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Chattogram&country=Bangladesh&method=1&school=${school}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.data?.timings) {
+          baseTimings = {
             Fajr: sanitize12h(data.data.timings.Fajr),
             Sunrise: sanitize12h(data.data.timings.Sunrise),
             Dhuhr: sanitize12h(data.data.timings.Dhuhr),
             Asr: sanitize12h(data.data.timings.Asr),
             Maghrib: sanitize12h(data.data.timings.Maghrib),
             Isha: sanitize12h(data.data.timings.Isha)
-          },
-          provider: 'AlAdhan City'
-        };
+          };
+          providerName = 'AlAdhan City';
+        }
       }
+    } catch (e) {
+      console.warn('[Prayer Focus] AlAdhan city failed, cascading...');
     }
-  } catch (e) {
-    console.warn('[Prayer Focus] AlAdhan city failed, cascading...');
   }
 
   // 3. PrayZone
-  try {
-    const res = await fetch('https://api.pray.zone/v2/times/today.json?city=dhaka');
-    if (res.ok) {
-      const data = await res.json();
-      const t = data?.results?.datetime?.[0]?.times;
-      if (t?.Fajr) {
-        return {
-          timings: {
+  if (!baseTimings) {
+    try {
+      const res = await fetch('https://api.pray.zone/v2/times/today.json?city=dhaka');
+      if (res.ok) {
+        const data = await res.json();
+        const t = data?.results?.datetime?.[0]?.times;
+        if (t?.Fajr) {
+          baseTimings = {
             Fajr: sanitize12h(t.Fajr),
             Sunrise: sanitize12h(t.Sunrise),
             Dhuhr: sanitize12h(t.Dhuhr),
             Asr: sanitize12h(t.Asr),
             Maghrib: sanitize12h(t.Maghrib),
             Isha: sanitize12h(t.Isha)
-          },
-          provider: 'PrayZone API'
-        };
+          };
+          providerName = 'PrayZone API';
+        }
       }
+    } catch (e) {
+      console.warn('[Prayer Focus] PrayZone failed, cascading...');
     }
-  } catch (e) {
-    console.warn('[Prayer Focus] PrayZone failed, cascading...');
   }
 
-  // Guaranteed Local Engine fallback
+  if (!baseTimings) {
+    baseTimings = { Fajr: '04:45', Sunrise: '06:01', Dhuhr: '11:37', Asr: '15:36', Maghrib: '17:12', Isha: '18:28' };
+    providerName = 'Local Solar Engine';
+  }
+
+  const adjusted = applyMinuteOffsetsAndOverrides(baseTimings, offsets, overrides);
+
   return {
-    timings: { Fajr: '04:45', Sunrise: '06:01', Dhuhr: '11:37', Asr: '15:36', Maghrib: '17:12', Isha: '18:28' },
-    provider: 'Local Solar Engine'
+    timings: adjusted,
+    provider: providerName
   };
 }
 
@@ -363,7 +421,7 @@ function openUrl(url) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const { loc, provider, juristic, completed } = await getStoredState();
+  const { storedTimes, loc, offsets, overrides, provider, juristic, completed } = await getStoredState();
 
   const lat = loc?.lat || 22.3569;
   const lng = loc?.lng || 91.7832;
@@ -377,11 +435,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   const locFooter = document.getElementById('locationFooterText');
   if (locFooter) locFooter.textContent = `${nameEn}, ${country} (${timezone})`;
 
-  const data = await fetchPrayerTimes(lat, lng, juristic);
   const providerLabel = document.getElementById('providerLabel');
-  if (providerLabel) providerLabel.textContent = data.provider + ' · Online';
 
-  const t = data.timings;
+  let t = null;
+
+  if (storedTimes && storedTimes.fajr) {
+    t = {
+      Fajr: storedTimes.fajr,
+      Sunrise: storedTimes.sunrise,
+      Dhuhr: storedTimes.dhuhr,
+      Asr: storedTimes.asr,
+      Maghrib: storedTimes.maghrib,
+      Isha: storedTimes.isha
+    };
+    if (providerLabel) providerLabel.textContent = 'Dashboard Live Sync · Online';
+  } else {
+    const data = await fetchPrayerTimes(lat, lng, juristic, offsets, overrides);
+    if (providerLabel) providerLabel.textContent = data.provider + ' · Online';
+    t = data.timings;
+  }
 
   if (t) {
     renderPrayerCards(t, completed);
@@ -408,7 +480,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (refreshBtn) {
     refreshBtn.addEventListener('click', async () => {
       refreshBtn.textContent = '...';
-      const updated = await fetchPrayerTimes(lat, lng, juristic);
+      const updated = await fetchPrayerTimes(lat, lng, juristic, offsets, overrides);
       refreshBtn.textContent = '↻ Refresh';
       if (providerLabel) providerLabel.textContent = updated.provider + ' · Online';
       if (updated.timings) updateLiveCounters(updated.timings, completed);

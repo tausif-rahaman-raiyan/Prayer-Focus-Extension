@@ -44,6 +44,7 @@ interface SettingsViewProps {
   minuteOffsets: PrayerMinuteOffsets;
   onSaveMinuteOffsets: (offsets: PrayerMinuteOffsets) => void;
   currentTimes?: PrayerTimes;
+  onResetAllSettings?: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -63,7 +64,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onSaveManualOverrides,
   minuteOffsets,
   onSaveMinuteOffsets,
-  currentTimes
+  currentTimes,
+  onResetAllSettings
 }) => {
   const [activeCategory, setActiveCategory] = useState<string>(() => {
     if (typeof window !== 'undefined' && window.location.hash === '#manual') return 'manual';
@@ -604,14 +606,31 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <div className="space-y-4">
               <h2 className="text-base font-bold text-slate-100">Advanced & Cache Controls</h2>
               <p className="text-xs text-slate-400">
-                Clear stored prayer schedule cache or reset local preferences.
+                Clear stored prayer schedule cache or reset all local preferences and prayer history back to factory state.
               </p>
-              <button
-                onClick={handleClearCache}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 font-semibold text-xs rounded-xl border border-slate-700 transition-colors"
-              >
-                Clear Cached Prayer Data
-              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={handleClearCache}
+                  className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-amber-300 font-semibold text-xs rounded-xl border border-slate-700 transition-colors cursor-pointer"
+                >
+                  Clear Cached Prayer Data
+                </button>
+                <button
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to reset all settings, minute offsets, fixed times, bookmarks, and prayer history to factory defaults?')) {
+                      handleClearCache();
+                      const globalChrome = (typeof window !== 'undefined' && (window as any).chrome) ? (window as any).chrome : null;
+                      if (globalChrome && globalChrome.storage && globalChrome.storage.local) {
+                        try { globalChrome.storage.local.clear(); } catch (e) {}
+                      }
+                      onResetAllSettings?.();
+                    }
+                  }}
+                  className="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer"
+                >
+                  Reset All Settings & Data
+                </button>
+              </div>
             </div>
           )}
         </div>

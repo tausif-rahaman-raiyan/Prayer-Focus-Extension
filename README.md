@@ -176,6 +176,19 @@ npm run build && node scripts/pack-extension.js
 
 ---
 
+### Option D: Deploy Web Dashboard to GitHub Pages
+
+> [!TIP]
+> The automated GitHub Workflow `.github/workflows/build-extension.yml` automatically builds the app and publishes the compiled production bundle (`dist/`) to the **`gh-pages`** branch on every push.
+
+To enable free live website hosting without `MIME type` or `application/octet-stream` errors:
+1. Go to your GitHub repository **Settings > Pages**.
+2. Under **Build and deployment > Source**, select **Deploy from a branch**.
+3. Under **Branch**, select **`gh-pages`** and folder **`/ (root)`**, then click **Save**.
+4. Your website will be live in ~60 seconds at `https://<username>.github.io/<repository-name>/`!
+
+---
+
 ## 📁 Project Structure
 
 ```

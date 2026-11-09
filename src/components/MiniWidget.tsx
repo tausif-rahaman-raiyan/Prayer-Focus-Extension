@@ -106,18 +106,8 @@ export const MiniWidget: React.FC<MiniWidgetProps> = ({
       {/* Header Bar with Emerald Crescent Moon Icon */}
       <div className="px-4 py-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#152820] to-[#08100C] border border-emerald-500/40 flex items-center justify-center relative shadow-sm shrink-0">
-            <svg viewBox="0 0 128 128" className="w-4.5 h-4.5">
-              <path
-                d="M78 24 C46 24 22 48 22 80 C22 104 38 114 54 114 C36 102 34 76 52 52 C64 36 78 30 78 24 Z"
-                fill="#34D399"
-              />
-              <polygon
-                transform="translate(80, 52) scale(0.9)"
-                points="0,-18 5,-6 18,-5 8,4 12,16 0,9 -12,16 -8,4 -18,-5 -5,-6"
-                fill="#F59E0B"
-              />
-            </svg>
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#152820] to-[#08100C] border border-emerald-500/40 flex items-center justify-center relative shadow-sm shrink-0 overflow-hidden">
+            <img src="./icons/app-logo.png" className="w-5 h-5 object-contain" alt="Prayer Focus" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">

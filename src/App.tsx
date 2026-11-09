@@ -118,14 +118,16 @@ export default function App() {
       if (saved) return JSON.parse(saved);
     } catch (e) {}
     return {
+      enabled: true,
+      soundEnabled: true,
+      reminderMinutesBefore: 0,
       fajr: true,
       dhuhr: true,
       asr: true,
       maghrib: true,
       isha: true,
       tahajjud: true,
-      advanceMinutes: 10,
-      soundEnabled: true
+      advanceMinutes: 10
     };
   });
 
@@ -283,15 +285,17 @@ export default function App() {
     } catch (e) {}
   };
 
-  // Persist settings
+  // Request desktop notification permission on startup if supported
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
+  }, []);
+
+  // Persist settings & sync with Chrome extension storage
   useEffect(() => {
     try {
       localStorage.setItem('prayer_focus_location', JSON.stringify(location));
-    } catch (e) {}
-  }, [location]);
-
-  useEffect(() => {
-    try {
       localStorage.setItem('prayer_focus_provider', preferredProvider);
       localStorage.setItem('prayer_focus_juristic', juristic);
       localStorage.setItem('prayer_focus_calcmethod', calcMethod);
@@ -300,7 +304,78 @@ export default function App() {
       localStorage.setItem('prayer_focus_viewmode', viewMode);
       localStorage.setItem('prayer_focus_bookmarks', JSON.stringify(bookmarkedQuotes));
     } catch (e) {}
-  }, [preferredProvider, juristic, calcMethod, theme, notifications, viewMode, bookmarkedQuotes]);
+
+    const globalChrome = (typeof window !== 'undefined' && (window as any).chrome) ? (window as any).chrome : null;
+    if (globalChrome && globalChrome.storage && globalChrome.storage.local) {
+      try {
+        globalChrome.storage.local.set({
+          PRAYER_FOCUS_TIMES: times,
+          prayer_focus_times: times,
+          PRAYER_FOCUS_LOCATION: location,
+          prayer_focus_location: location,
+          PRAYER_FOCUS_OFFSETS: minuteOffsets,
+          prayer_focus_minute_offsets: minuteOffsets,
+          PRAYER_FOCUS_OVERRIDES: manualOverrides,
+          prayer_focus_manual_overrides: manualOverrides,
+          PRAYER_FOCUS_COMPLETED: completedPrayers,
+          prayer_focus_completed: completedPrayers,
+          PRAYER_FOCUS_JURISTIC: juristic,
+          prayer_focus_juristic: juristic
+        });
+      } catch (e) {}
+    }
+  }, [location, preferredProvider, juristic, calcMethod, theme, notifications, viewMode, bookmarkedQuotes, times, minuteOffsets, manualOverrides, completedPrayers]);
+
+  const handleResetAllSettings = () => {
+    try {
+      const keys = Object.keys(localStorage).filter((k) => k.startsWith('pf_') || k.startsWith('prayer_focus_'));
+      keys.forEach((k) => localStorage.removeItem(k));
+    } catch (e) {}
+
+    const globalChrome = (typeof window !== 'undefined' && (window as any).chrome) ? (window as any).chrome : null;
+    if (globalChrome && globalChrome.storage && globalChrome.storage.local) {
+      try { globalChrome.storage.local.clear(); } catch (e) {}
+    }
+
+    setLocation(DEFAULT_LOCATION);
+    setPreferredProvider('aladhan');
+    setJuristic('hanafi');
+    setCalcMethod('karachi');
+    setTheme('dark');
+    setNotifications({
+      enabled: true,
+      soundEnabled: true,
+      reminderMinutesBefore: 0,
+      fajr: true,
+      dhuhr: true,
+      asr: true,
+      maghrib: true,
+      isha: true,
+      tahajjud: true,
+      advanceMinutes: 10
+    });
+    setManualOverrides({
+      enabled: false,
+      fajr: '',
+      sunrise: '',
+      dhuhr: '',
+      asr: '',
+      maghrib: '',
+      isha: '',
+      tahajjudStart: ''
+    });
+    setMinuteOffsets({
+      fajr: 0,
+      sunrise: 0,
+      dhuhr: 0,
+      asr: 0,
+      maghrib: 0,
+      isha: 0,
+      tahajjud: 0
+    });
+    setCompletedPrayers({});
+    setBookmarkedQuotes(['tirmidhi-413']);
+  };
 
   const handleTogglePrayer = (prayerKey: string) => {
     setCompletedPrayers((prev) => {
@@ -393,6 +468,7 @@ export default function App() {
           onSaveManualOverrides={handleSaveManualOverrides}
           minuteOffsets={minuteOffsets}
           onSaveMinuteOffsets={handleSaveMinuteOffsets}
+          onResetAllSettings={handleResetAllSettings}
         />
       ) : (
         <div className="min-h-screen bg-[var(--bg-canvas)] flex flex-col items-center justify-center p-4">
