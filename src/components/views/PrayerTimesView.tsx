@@ -164,21 +164,23 @@ export const PrayerTimesView: React.FC<PrayerTimesViewProps> = ({
                     Till: <strong className="text-slate-300">{format12HourTime(w.endTime)}</strong>
                   </div>
 
-                  <div className="mt-2">
-                    <span
-                      className={`text-[9px] px-2 py-0.5 rounded-full font-semibold border ${
-                        w.status === 'finished'
-                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                          : w.status === 'missed'
-                          ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                          : w.status === 'active'
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse'
-                          : 'bg-slate-800 text-slate-400 border-slate-700'
-                      }`}
-                    >
-                      {w.statusLabel}
-                    </span>
-                  </div>
+                  {w.statusLabel && (
+                    <div className="mt-2">
+                      <span
+                        className={`text-[9px] px-2 py-0.5 rounded-full font-semibold border ${
+                          w.status === 'finished'
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                            : w.status === 'missed'
+                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                            : w.status === 'active'
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse'
+                            : 'bg-slate-800 text-slate-400 border-slate-700'
+                        }`}
+                      >
+                        {w.statusLabel}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {isClickable && (

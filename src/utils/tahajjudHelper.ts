@@ -330,6 +330,9 @@ export function getDailyWaqtWindows(
     if (currentHours >= startVal && currentHours < endVal) {
       return { status: 'active', label: 'Active Now' };
     }
+    if (key === 'sunrise') {
+      return { status: 'upcoming', label: '' };
+    }
     return { status: 'missed', label: 'Unfinished' };
   };
 
