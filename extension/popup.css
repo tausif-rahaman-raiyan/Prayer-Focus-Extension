@@ -1,0 +1,289 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  width: 360px;
+  background: #081014;
+  color: #f1f5f9;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+.font-bengali { font-family: 'Hind Siliguri', sans-serif; }
+.font-arabic { font-family: 'Amiri', serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+
+.popup-header {
+  padding: 10px 14px;
+  background: #04090c;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.popup-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #152820 0%, #08100c 100%);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.logo-svg {
+  width: 18px;
+  height: 18px;
+}
+.brand-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.brand-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+.live-badge {
+  font-size: 9px;
+  font-weight: 600;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.provider-info {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 1px;
+}
+.location-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.hero-waqt {
+  padding: 12px 14px;
+  background: linear-gradient(180deg, #091519 0%, #060e12 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.waqt-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #cbd5e1;
+  margin-bottom: 4px;
+}
+.waqt-meta strong { color: #34d399; font-weight: 700; }
+.countdown-large {
+  font-size: 30px;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: -0.5px;
+}
+.progress-bar-bg {
+  width: 100%;
+  height: 4px;
+  background: #15272a;
+  border-radius: 9999px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: #10b981;
+  width: 50%;
+  transition: width 1s ease-out;
+}
+
+.tahajjud-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgba(6, 78, 59, 0.18);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+}
+.tahajjud-title { font-size: 11px; font-weight: 600; color: #34d399; }
+.tahajjud-sub { font-size: 9.5px; color: #94a3b8; margin-top: 1px; }
+.tahajjud-timer { font-size: 13px; font-weight: 700; color: #34d399; }
+
+/* 6 Prayer Cards Grid with Start and Limit */
+.prayers-list {
+  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+.prayer-card {
+  background: #0d1a20;
+  border: 1px solid #162c33;
+  border-radius: 9px;
+  padding: 7px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  transition: all 0.15s ease;
+}
+.prayer-card.active {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+}
+.prayer-card.missed {
+  border-color: rgba(244, 63, 94, 0.6);
+  background: rgba(244, 63, 94, 0.15);
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.15);
+}
+.prayer-card.missed .card-name {
+  color: #fda4af;
+}
+.prayer-card.missed .time {
+  color: #f43f5e;
+}
+.prayer-card.done {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.1);
+}
+.prayer-card .card-name {
+  font-weight: 600;
+  color: #e2e8f0;
+}
+.prayer-card .card-times {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.prayer-card .time {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: #34d399;
+  font-size: 12px;
+}
+.prayer-card .limit {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+.card-badge {
+  font-size: 8.5px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 4px;
+  margin-top: 2px;
+  display: inline-block;
+  letter-spacing: 0.2px;
+}
+.card-badge.missed {
+  color: #fda4af;
+  background: rgba(244, 63, 94, 0.25);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+}
+.card-badge.done {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.card-badge.active {
+  color: #fef08a;
+  background: rgba(234, 179, 8, 0.2);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+}
+
+/* Dual Actions matching user screenshot */
+.dashboard-actions {
+  padding: 10px 14px 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  font-family: inherit;
+}
+.btn-dashboard {
+  background: #10b981;
+  color: #022c22;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+.btn-dashboard:hover {
+  background: #34d399;
+  transform: translateY(-1px);
+}
+.btn-settings {
+  background: #0f1c22;
+  color: #e2e8f0;
+  border: 1px solid #1b333d;
+}
+.btn-settings:hover {
+  background: #172c35;
+  color: #ffffff;
+  border-color: #2b4b57;
+}
+
+/* Location line matching user screenshot: ✦ Chattogram, Bangladesh (Asia/Dhaka) */
+.location-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px 14px 8px;
+  font-size: 10.5px;
+  color: #64748b;
+  text-align: center;
+}
+.sparkle-icon {
+  color: #10b981;
+  font-size: 11px;
+}
+
+/* Footer bottom bar */
+.footer {
+  padding: 8px 14px 10px;
+  display: flex;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: #060c0e;
+}
+.btn-refresh-full {
+  width: 100%;
+  background: #0f171b;
+  border: 1px solid #1a2a32;
+  color: #94a3b8;
+  padding: 8px 12px;
+  font-size: 11.5px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.btn-refresh-full:hover {
+  background: #16242a;
+  color: #f1f5f9;
+  border-color: #2b4b57;
+}
